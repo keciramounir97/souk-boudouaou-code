@@ -10,7 +10,8 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:pull": "prisma db pull",
-    "prisma:validate": "prisma validate"
+    "prisma:validate": "prisma validate",
+    "build": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
