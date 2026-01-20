@@ -58,9 +58,7 @@ const app = express();
 
 // 1. Trust Proxy (CRITICAL for cPanel/Passenger/Nginx)
 // Must be first to ensure req.ip and req.protocol are correct
-if (isProduction) {
-  app.set("trust proxy", 1);
-}
+app.set("trust proxy", 1);
 
 // 2. CORS (Must be VERY early, before any body parsing or routes)
 // Apply CORS to all routes - CORS middleware handles OPTIONS preflight automatically
