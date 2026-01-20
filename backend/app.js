@@ -63,11 +63,7 @@ if (isProduction) {
 }
 
 // 2. CORS (Must be VERY early, before any body parsing or routes)
-// Handle OPTIONS preflight requests FIRST - catch all OPTIONS before other middleware
-// The CORS middleware handles preflight automatically, but we ensure it's processed early
-app.options('*', corsMiddleware);
-
-// Apply CORS to all routes (this also handles OPTIONS, but the explicit app.options above ensures priority)
+// Apply CORS to all routes - CORS middleware handles OPTIONS preflight automatically
 app.use(corsMiddleware);
 
 // 3. Security Headers (Helmet) - Applied AFTER CORS to avoid conflicts with preflight
@@ -136,7 +132,22 @@ app.use("/api/public/listings", publicListingRoutes);
 app.use("/api/public/orders", publicOrderRoutes);
 app.use("/api/public/site", publicSiteRoutes);
 
-// 404
+// Serve static frontend files in production
+if (isProduction) {
+  const frontendDistPath = path.join(__dirname, "..", "frontend", "dist");
+  if (fs.existsSync(frontendDistPath)) {
+    app.use(express.static(frontendDistPath));
+    // SPA fallback - serve index.html for non-API routes
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api") || req.path.startsWith("/auth") || req.path.startsWith("/uploads")) {
+        return next();
+      }
+      res.sendFile(path.join(frontendDistPath, "index.html"));
+    });
+  }
+}
+
+// 404 for API routes
 app.use((req, res) => {
   res
     .status(404)
@@ -544,7 +555,7 @@ async function start() {
   
   // 5. Start Server
   console.log("\n🌐 Starting Server...");
-  const port = process.env.PORT || 5000;
+  const port = isProduction ? (process.env.PORT || 5000) : (process.env.PORT || 3000);
   const server = app.listen(port, "0.0.0.0", () => {
     console.log("=".repeat(60));
     console.log(`✅ SERVER STARTED SUCCESSFULLY`);

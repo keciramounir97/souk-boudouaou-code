@@ -21,23 +21,23 @@ export default defineConfig(({ mode }) => {
       include: ["react", "react-dom"],
     },
     server: {
-      host: true, // Listen on all network interfaces (public and private IP)
-      port: 5173,
-      strictPort: false,
+      host: "0.0.0.0",
+      port: 5000,
+      strictPort: true,
+      allowedHosts: "all",
       proxy: {
         "/api": {
-          // Use VITE_DEV_PROXY_TARGET or default to localhost:5000
-          target: process.env.VITE_DEV_PROXY_TARGET || "http://localhost:5000",
+          target: process.env.VITE_DEV_PROXY_TARGET || "http://localhost:3000",
           changeOrigin: true,
           secure: false,
         },
         "/auth": {
-          target: process.env.VITE_DEV_PROXY_TARGET || "http://localhost:5000",
+          target: process.env.VITE_DEV_PROXY_TARGET || "http://localhost:3000",
           changeOrigin: true,
           secure: false,
         },
         "/uploads": {
-          target: process.env.VITE_DEV_PROXY_TARGET || "http://localhost:5000",
+          target: process.env.VITE_DEV_PROXY_TARGET || "http://localhost:3000",
           changeOrigin: true,
           secure: false,
         },

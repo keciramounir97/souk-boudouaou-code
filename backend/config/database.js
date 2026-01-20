@@ -16,7 +16,7 @@ try {
 async function connectDatabase() {
   try {
     await prisma.$connect();
-    console.log("MySQL Connected");
+    console.log("PostgreSQL Connected");
   } catch (err) {
     console.error("DB Connection Error:", err);
     // In production, we might not want to exit immediately if DB is flaky
