@@ -33,7 +33,7 @@ This is a full-stack web application with:
 ## Running the Application
 
 The application runs with two workflows:
-1. **Frontend** - Vite dev server on port 5000
+1. **Frontend** - Vite dev server on port 5000 (configured to allow all hosts for Replit)
 2. **Backend API** - Express server on port 3000
 
 The frontend proxies API requests to the backend automatically.
@@ -53,8 +53,8 @@ Uses PostgreSQL with Prisma ORM. Main models:
 ```bash
 # Backend
 cd backend && npm run dev          # Development with nodemon
+cd backend && npm run build        # Build (prisma generate)
 cd backend && npm run prisma:push  # Push schema changes to DB
-cd backend && npm run prisma:generate  # Regenerate Prisma client
 
 # Frontend
 cd frontend && npm run dev         # Development server
@@ -65,5 +65,7 @@ cd frontend && npm run build       # Production build
 
 - Migrated from MySQL to PostgreSQL for Replit compatibility
 - Updated backend port from 5000 to 3000 to avoid conflict with frontend
-- Configured Vite to allow all hosts for Replit proxy
+- Configured Vite to allow all hosts and added HMR client port (443) for Replit proxy
 - Fixed Express 5 compatibility issue with wildcard CORS options
+- Updated build scripts to handle Prisma generation in deployment
+- Injected Super Admin users for testing and administration
