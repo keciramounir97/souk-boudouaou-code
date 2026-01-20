@@ -57,3 +57,19 @@ externalPort = 80
 deploymentTarget = "autoscale"
 run = ["bash", "-c", "cd backend && NODE_ENV=production node server.js"]
 build = ["bash", "-c", "cd frontend && npm install && npm run build && cd ../backend && npm install && npx prisma generate"]
+
+[userenv]
+
+[userenv.shared]
+SUPER_ADMIN_EMAIL = "mounir@soukboudouaou.com"
+OTP_TTL_MINUTES = "10"
+SUPER_ADMIN_PASSWORD = "admin2025$"
+JWT_REFRESH_EXPIRES_IN = "30d"
+SUPER_ADMIN_USERNAME = "mounir"
+JWT_EXPIRES_IN = "7d"
+ALLOW_ALL_ORIGINS = "1"
+SUPER_ADMIN_FULL_NAME = "Souk Super Admin"
+JWT_SECRET = "1c9ab70df91a73b136f045e739d1f00d9b638557ce6cbc7ef62fb735a7fa4bf45e9b4f8bc0986a4fe0c04adb4732424930f74a5f19f99e5e8559ae6ed8c95cfe"
+SKIP_ENV_VALIDATION = "1"
+JWT_REFRESH_SECRET = "cbf4f8e0460db9c030407415186701a1620762291574165865a620c0f6b9983df5f13bf7fdb38991e74525dffeb24083d34b1f81c0b0d0b554434033451bd478"
+BCRYPT_ROUNDS = "12"
