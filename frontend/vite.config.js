@@ -25,9 +25,7 @@ export default defineConfig(({ mode }) => {
       port: 5000,
       strictPort: true,
       allowedHosts: [
-        "5550e58c-d211-4ebe-9a5a-5799c7b3f74f-00-3r0pxbo27gedi.picard.replit.dev",
-        ".replit.dev",
-        ".replit.app"
+        "5550e58c-d211-4ebe-9a5a-5799c7b3f74f-00-3r0pxbo27gedi.picard.replit.dev"
       ],
       proxy: {
         "/api": {
