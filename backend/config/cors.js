@@ -16,7 +16,7 @@ const DEFAULT_ALLOWED_ORIGINS = [
   "https://soukboudouaou.com",
   "https://www.soukboudouaou.com",
   "https://server.soukboudouaou.com",
-  "https://admin.soukboudouaou.com",
+  "https://5550e58c-d211-4ebe-9a5a-5799c7b3f74f-00-3r0pxbo27gedi.picard.replit.dev",
 ];
 
 // Load from environment or use defaults
