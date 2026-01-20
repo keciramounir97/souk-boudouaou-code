@@ -54,23 +54,8 @@ const isAllowedOrigin = (origin) => {
 };
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, server-to-server, same-origin)
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    if (isAllowedOrigin(origin)) {
-      // When credentials: true, we MUST return the specific origin (not *)
-      // This is required by CORS spec when credentials are enabled
-      callback(null, origin);
-    } else {
-      console.warn(`[CORS] Blocked request from origin: ${origin}`);
-      console.warn(`[CORS] Allowed origins: ${allowedOrigins.join(", ")}`);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true, // Required for cookies/sessions - MUST be true for Authorization headers
+  origin: true,
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
   allowedHeaders: [
     "Content-Type",

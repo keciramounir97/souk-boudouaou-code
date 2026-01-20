@@ -24,22 +24,20 @@ export default defineConfig(({ mode }) => {
       host: "0.0.0.0",
       port: 5000,
       strictPort: true,
-      allowedHosts: [
-        "5550e58c-d211-4ebe-9a5a-5799c7b3f74f-00-3r0pxbo27gedi.picard.replit.dev"
-      ],
+      allowedHosts: "all",
       proxy: {
         "/api": {
-          target: process.env.VITE_DEV_PROXY_TARGET || "http://localhost:3000",
+          target: "http://localhost:3000",
           changeOrigin: true,
           secure: false,
         },
         "/auth": {
-          target: process.env.VITE_DEV_PROXY_TARGET || "http://localhost:3000",
+          target: "http://localhost:3000",
           changeOrigin: true,
           secure: false,
         },
         "/uploads": {
-          target: process.env.VITE_DEV_PROXY_TARGET || "http://localhost:3000",
+          target: "http://localhost:3000",
           changeOrigin: true,
           secure: false,
         },
