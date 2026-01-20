@@ -57,33 +57,11 @@ const corsOptions = {
   origin: true,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization", // Required for Bearer tokens
-    "X-Requested-With",
-    "Accept",
-    "Accept-Language",
-    "Origin",
-    "Access-Control-Request-Method",
-    "Access-Control-Request-Headers",
-    "device-id",
-    "sentry-trace",
-    "baggage",
-    "Cache-Control",
-    "Pragma",
-    "X-CSRF-Token", // For CSRF protection if needed
-    "X-Forwarded-For",
-    "X-Real-IP",
-  ],
-  exposedHeaders: [
-    "Content-Range",
-    "X-Total-Count",
-    "Content-Disposition", // Useful for file downloads
-    "Set-Cookie", // Expose Set-Cookie header for cookie handling
-  ],
-  optionsSuccessStatus: 204, // Essential for some legacy browsers/mobile
-  maxAge: 86400, // Preflight cache (24 hours)
-  preflightContinue: false, // Don't pass preflight to next handler, respond immediately
+  allowedHeaders: ["*"],
+  exposedHeaders: ["*"],
+  optionsSuccessStatus: 204,
+  maxAge: 86400,
+  preflightContinue: false,
 };
 
 const corsMiddleware = cors(corsOptions);
