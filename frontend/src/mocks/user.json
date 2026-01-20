@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "user": {
+    "_id": "u1",
+    "fullName": "Utilisateur Démo",
+    "phone": "0550 12 34 56",
+    "email": "demo@souk.dz",
+    "wilaya": "Algiers",
+    "role": "user",
+    "createdAt": "2025-10-10T09:00:00.000Z"
+  }
+}
+

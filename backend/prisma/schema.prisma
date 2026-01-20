@@ -1,0 +1,148 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x", "debian-openssl-1.1.x"]
+}
+
+model User {
+  id                       Int       @id @default(autoincrement())
+  username                 String?   @unique
+  fullName                 String?
+  email                    String?   @unique
+  phone                    String?
+  wilaya                   String?
+  role                     String    @default("user")
+  isActive                 Boolean   @default(true)
+  passwordHash             String?
+  otpHash                  String?   @db.Text
+  otpExpiresAt             DateTime?
+  verified                 Boolean   @default(false)
+  otp                      String?   @db.Text
+  otpExpires               DateTime?
+  emailVerifyTokenHash     String?   @db.Text
+  emailVerifyTokenExpiresAt DateTime?
+  sessionToken             String?   @unique
+  lastLogin                DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  orders     Order[]
+  inquiries  Inquiry[]
+  photos     UserPhoto[]
+  clickEvents ClickEvent[]
+
+  @@map("Users")
+}
+
+model Order {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  title         String
+  slug          String?   @unique
+  category      String    @default("Poulet")
+  wilaya        String?
+  commune       String?
+  details       String?   @db.Text
+  description   String?   @db.Text
+  status        OrderStatus @default(published)
+  preparationDate DateTime?
+  vaccinated    Boolean?
+  pricePerKg    Float?
+  unit          String    @default("kg")
+  contactPhone  String?
+  contactEmail  String?
+  photo         String?
+  coverImage    String?
+  images        String?   @db.Text
+  tags          String?   @db.Text
+  views         Int       @default(0)
+  favorites     Int       @default(0)
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inquiries  Inquiry[]
+  clickEvents ClickEvent[]
+
+  @@index([status])
+  @@index([status, createdAt])
+  @@index([category])
+  @@index([wilaya])
+  @@map("Orders")
+}
+
+enum OrderStatus {
+  draft
+  published
+}
+
+model SiteSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("SiteSettings")
+}
+
+model ClickEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  listingId Int?
+  kind      String
+  path      String?
+  userAgent String?
+  ip        String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  listing Order? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+
+  @@map("ClickEvents")
+}
+
+model UserPhoto {
+  id           Int            @id @default(autoincrement())
+  userId       Int
+  source       UserPhotoSource @default(manual)
+  referenceId  String?
+  path         String
+  originalName String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("UserPhotos")
+}
+
+enum UserPhotoSource {
+  listing
+  cta
+  hero
+  manual
+}
+
+model Inquiry {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  listingId Int
+  name      String?
+  email     String?
+  phone     String?
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  listing Order  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("Inquiries")
+}

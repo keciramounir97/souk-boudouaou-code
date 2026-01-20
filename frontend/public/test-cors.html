@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test - Frontend to Backend</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .config {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .config label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .config input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .config input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .test-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+        .result.info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            color: #0c5460;
+        }
+        .result.warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status.pass {
+            background: #28a745;
+            color: white;
+        }
+        .status.fail {
+            background: #dc3545;
+            color: white;
+        }
+        .status.pending {
+            background: #6c757d;
+            color: white;
+        }
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 CORS Test Suite</h1>
+        <p class="subtitle">Test cross-origin requests from frontend to backend</p>
+
+        <div class="config">
+            <label for="backendUrl">Backend URL:</label>
+            <input type="text" id="backendUrl" value="https://server.soukboudouaou.com" placeholder="https://server.soukboudouaou.com">
+            <small style="color: #666;">Current origin: <strong id="currentOrigin"></strong></small>
+        </div>
+
+        <div>
+            <button onclick="testPreflight()">Test OPTIONS Preflight</button>
+            <button onclick="testGetRequest()">Test GET Request</button>
+            <button onclick="testPostRequest()">Test POST Request</button>
+            <button onclick="testWithCredentials()">Test With Credentials</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Results <span id="testStatus" class="status pending">Pending</span></h2>
+            <div id="results" class="result info">Click a test button to start...</div>
+        </div>
+    </div>
+
+    <script>
+        // Display current origin
+        document.getElementById('currentOrigin').textContent = window.location.origin;
+
+        const resultsDiv = document.getElementById('results');
+        const statusSpan = document.getElementById('testStatus');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'info';
+            resultsDiv.className = `result ${className}`;
+            resultsDiv.textContent += `[${timestamp}] ${message}\n`;
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        function clearResults() {
+            resultsDiv.textContent = '';
+            statusSpan.textContent = 'Running...';
+            statusSpan.className = 'status pending';
+        }
+
+        function setStatus(passed) {
+            if (passed === true) {
+                statusSpan.textContent = 'Passed ✓';
+                statusSpan.className = 'status pass';
+            } else if (passed === false) {
+                statusSpan.textContent = 'Failed ✗';
+                statusSpan.className = 'status fail';
+            } else {
+                statusSpan.textContent = 'Pending';
+                statusSpan.className = 'status pending';
+            }
+        }
+
+        function getBackendUrl() {
+            return document.getElementById('backendUrl').value.trim() || 'https://server.soukboudouaou.com';
+        }
+
+        async function testPreflight() {
+            clearResults();
+            log('Testing OPTIONS preflight request...', 'info');
+            
+            const backendUrl = getBackendUrl();
+            const apiUrl = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
+            
+            try {
+                const response = await fetch(`${apiUrl}/health`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'GET',
+                        'Access-Control-Request-Headers': 'Content-Type, Authorization',
+                    },
+                });
+
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                    'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials'),
+                    'Access-Control-Max-Age': response.headers.get('Access-Control-Max-Age'),
+                };
+
+                log(`Status: ${response.status}`, response.status === 204 || response.status === 200 ? 'success' : 'error');
+                log(`\nCORS Headers:`, 'info');
+                Object.entries(corsHeaders).forEach(([key, value]) => {
+                    log(`  ${key}: ${value || 'MISSING'}`, value ? 'success' : 'error');
+                });
+
+                const originAllowed = corsHeaders['Access-Control-Allow-Origin'] === window.location.origin || 
+                                     corsHeaders['Access-Control-Allow-Origin'] === '*';
+                const hasCredentials = corsHeaders['Access-Control-Allow-Credentials'] === 'true';
+                const hasMethods = !!corsHeaders['Access-Control-Allow-Methods'];
+
+                if (originAllowed && hasMethods) {
+                    log('\n✓ Preflight test PASSED', 'success');
+                    setStatus(true);
+                } else {
+                    log('\n✗ Preflight test FAILED - Missing required CORS headers', 'error');
+                    setStatus(false);
+                }
+            } catch (error) {
+                log(`\n✗ Preflight test FAILED: ${error.message}`, 'error');
+                log(`This usually means CORS is blocking the request.`, 'error');
+                setStatus(false);
+            }
+        }
+
+        async function testGetRequest() {
+            clearResults();
+            log('Testing GET request...', 'info');
+            
+            const backendUrl = getBackendUrl();
+            const apiUrl = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
+            
+            try {
+                const response = await fetch(`${apiUrl}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Origin': window.location.origin,
+                    },
+                    credentials: 'include',
+                });
+
+                const data = await response.json();
+                const corsOrigin = response.headers.get('Access-Control-Allow-Origin');
+
+                log(`Status: ${response.status}`, response.ok ? 'success' : 'error');
+                log(`Response: ${JSON.stringify(data, null, 2)}`, 'info');
+                log(`Access-Control-Allow-Origin: ${corsOrigin || 'MISSING'}`, corsOrigin ? 'success' : 'error');
+
+                if (response.ok && corsOrigin) {
+                    log('\n✓ GET request test PASSED', 'success');
+                    setStatus(true);
+                } else {
+                    log('\n✗ GET request test FAILED', 'error');
+                    setStatus(false);
+                }
+            } catch (error) {
+                log(`\n✗ GET request test FAILED: ${error.message}`, 'error');
+                if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+                    log('This is a CORS error. Check backend CORS configuration.', 'error');
+                }
+                setStatus(false);
+            }
+        }
+
+        async function testPostRequest() {
+            clearResults();
+            log('Testing POST request...', 'info');
+            
+            const backendUrl = getBackendUrl();
+            const apiUrl = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
+            
+            try {
+                const response = await fetch(`${apiUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin,
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'test@test.com',
+                        password: 'test123',
+                    }),
+                });
+
+                const corsOrigin = response.headers.get('Access-Control-Allow-Origin');
+                const data = await response.json().catch(() => ({ message: 'No JSON response' }));
+
+                log(`Status: ${response.status}`, response.status < 500 ? 'success' : 'error');
+                log(`Response: ${JSON.stringify(data, null, 2)}`, 'info');
+                log(`Access-Control-Allow-Origin: ${corsOrigin || 'MISSING'}`, corsOrigin ? 'success' : 'error');
+
+                // 400/401 is expected (auth failure), but CORS should still work
+                if (corsOrigin && response.status < 500) {
+                    log('\n✓ POST request test PASSED (auth failure expected)', 'success');
+                    setStatus(true);
+                } else {
+                    log('\n✗ POST request test FAILED', 'error');
+                    setStatus(false);
+                }
+            } catch (error) {
+                log(`\n✗ POST request test FAILED: ${error.message}`, 'error');
+                if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+                    log('This is a CORS error. Check backend CORS configuration.', 'error');
+                }
+                setStatus(false);
+            }
+        }
+
+        async function testWithCredentials() {
+            clearResults();
+            log('Testing request with credentials...', 'info');
+            
+            const backendUrl = getBackendUrl();
+            const apiUrl = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
+            
+            try {
+                const response = await fetch(`${apiUrl}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Origin': window.location.origin,
+                    },
+                    credentials: 'include', // This requires Access-Control-Allow-Credentials: true
+                });
+
+                const corsOrigin = response.headers.get('Access-Control-Allow-Origin');
+                const corsCredentials = response.headers.get('Access-Control-Allow-Credentials');
+
+                log(`Status: ${response.status}`, response.ok ? 'success' : 'error');
+                log(`Access-Control-Allow-Origin: ${corsOrigin || 'MISSING'}`, corsOrigin ? 'success' : 'error');
+                log(`Access-Control-Allow-Credentials: ${corsCredentials || 'MISSING'}`, corsCredentials === 'true' ? 'success' : 'error');
+
+                if (response.ok && corsOrigin && corsCredentials === 'true') {
+                    log('\n✓ Credentials test PASSED', 'success');
+                    setStatus(true);
+                } else {
+                    log('\n✗ Credentials test FAILED - Credentials require Access-Control-Allow-Credentials: true', 'error');
+                    setStatus(false);
+                }
+            } catch (error) {
+                log(`\n✗ Credentials test FAILED: ${error.message}`, 'error');
+                setStatus(false);
+            }
+        }
+
+        async function runAllTests() {
+            clearResults();
+            log('Running all CORS tests...\n', 'info');
+            
+            const tests = [
+                { name: 'Preflight', fn: testPreflight },
+                { name: 'GET Request', fn: testGetRequest },
+                { name: 'POST Request', fn: testPostRequest },
+                { name: 'With Credentials', fn: testWithCredentials },
+            ];
+
+            let passed = 0;
+            let failed = 0;
+
+            for (const test of tests) {
+                log(`\n=== ${test.name} ===`, 'info');
+                try {
+                    await test.fn();
+                    // Check if status is pass
+                    if (statusSpan.className.includes('pass')) {
+                        passed++;
+                    } else {
+                        failed++;
+                    }
+                } catch (error) {
+                    log(`Error running ${test.name}: ${error.message}`, 'error');
+                    failed++;
+                }
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between tests
+            }
+
+            log(`\n\n=== Summary ===`, 'info');
+            log(`Passed: ${passed}`, passed > 0 ? 'success' : 'info');
+            log(`Failed: ${failed}`, failed > 0 ? 'error' : 'info');
+            
+            if (failed === 0) {
+                setStatus(true);
+                log('\n✅ All tests passed!', 'success');
+            } else {
+                setStatus(false);
+                log('\n❌ Some tests failed. Review the results above.', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

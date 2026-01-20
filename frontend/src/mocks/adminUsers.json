@@ -1,0 +1,55 @@
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "id": 1,
+        "email": "test@tresormaison.com",
+        "username": "superadmin",
+        "fullName": "Super Admin",
+        "role": "super_admin",
+        "isActive": true,
+        "verified": true,
+        "createdAt": "2025-01-02T10:10:10.000Z",
+        "password": "admin2025$"
+      },
+      {
+        "id": 2,
+        "email": "admin@tresormaison.com",
+        "username": "admin",
+        "fullName": "Admin",
+        "role": "ADMIN",
+        "isActive": true,
+        "verified": true,
+        "createdAt": "2025-01-03T10:10:10.000Z",
+        "password": "admin12345$"
+      },
+      {
+        "id": 3,
+        "email": "user1@tresormaison.com",
+        "username": "user1",
+        "fullName": "User One",
+        "role": "user",
+        "isActive": true,
+        "verified": false,
+        "createdAt": "2025-01-04T10:10:10.000Z",
+        "password": "user12345$"
+      },
+      {
+        "id": 4,
+        "email": "user2@tresormaison.com",
+        "username": "user2",
+        "fullName": "User Two",
+        "role": "user",
+        "isActive": false,
+        "verified": true,
+        "createdAt": "2025-01-05T10:10:10.000Z",
+        "password": "user12345$"
+      }
+    ],
+    "total": 4,
+    "page": 1,
+    "limit": 100
+  }
+}
+
