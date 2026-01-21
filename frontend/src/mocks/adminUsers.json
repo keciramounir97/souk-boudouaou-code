@@ -10,8 +10,7 @@
         "role": "super_admin",
         "isActive": true,
         "verified": true,
-        "createdAt": "2025-01-02T10:10:10.000Z",
-        "password": "admin2025$"
+        "createdAt": "2025-01-02T10:10:10.000Z"
       },
       {
         "id": 2,
@@ -21,8 +20,7 @@
         "role": "ADMIN",
         "isActive": true,
         "verified": true,
-        "createdAt": "2025-01-03T10:10:10.000Z",
-        "password": "admin12345$"
+        "createdAt": "2025-01-03T10:10:10.000Z"
       },
       {
         "id": 3,
@@ -32,8 +30,7 @@
         "role": "user",
         "isActive": true,
         "verified": false,
-        "createdAt": "2025-01-04T10:10:10.000Z",
-        "password": "user12345$"
+        "createdAt": "2025-01-04T10:10:10.000Z"
       },
       {
         "id": 4,
@@ -43,8 +40,7 @@
         "role": "user",
         "isActive": false,
         "verified": true,
-        "createdAt": "2025-01-05T10:10:10.000Z",
-        "password": "user12345$"
+        "createdAt": "2025-01-05T10:10:10.000Z"
       }
     ],
     "total": 4,
@@ -52,4 +48,3 @@
     "limit": 100
   }
 }
-

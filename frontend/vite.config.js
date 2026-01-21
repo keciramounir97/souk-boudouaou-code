@@ -2,6 +2,10 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -24,12 +28,10 @@ export default defineConfig(({ mode }) => {
       host: "0.0.0.0",
       port: 5000,
       strictPort: true,
-      allowedHosts: [
-        "5550e58c-d211-4ebe-9a5a-5799c7b3f74f-00-3r0pxbo27gedi.picard.replit.dev",
-        "5550e58c-d211-4ebe-9a5a-5799c7b3f74f-00-3r0pxbo27gedi.picard.replit.app",
-        "5550e58c-d211-4ebe-9a5a-5799c7b3f74f-00-3r0pxbo27gedi.picard.replit.dev"
-      ],
-      hmr: true,
+      allowedHosts: [".replit.dev", ".replit.app", "localhost", "127.0.0.1"],
+      hmr: {
+        clientPort: 443,
+      },
       proxy: {
         "/api": {
           target: "http://localhost:3000",

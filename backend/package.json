@@ -11,7 +11,8 @@
     "prisma:push": "prisma db push",
     "prisma:pull": "prisma db pull",
     "prisma:validate": "prisma validate",
-    "build": "npx prisma generate && npx prisma db push"
+    "seed": "node scripts/seed.js",
+    "build": "npm run prisma:generate"
   },
   "keywords": [],
   "author": "",

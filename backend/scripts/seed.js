@@ -3,10 +3,13 @@ const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = process.env.SUPER_ADMIN_EMAIL || "mounir@soukboudouaou.com";
-  const username = process.env.SUPER_ADMIN_USERNAME || "mounir";
-  const fullName = process.env.SUPER_ADMIN_FULL_NAME || "Souk Super Admin";
-  const password = process.env.SUPER_ADMIN_PASSWORD || "admin2025$";
+  const email = process.env.SUPER_ADMIN_EMAIL;
+  const password = process.env.SUPER_ADMIN_PASSWORD;
+  const username = process.env.SUPER_ADMIN_USERNAME || "admin";
+  const fullName = process.env.SUPER_ADMIN_FULL_NAME || "Super Admin";
+
+  if (!email) throw new Error("SUPER_ADMIN_EMAIL is required for seeding.");
+  if (!password) throw new Error("SUPER_ADMIN_PASSWORD is required for seeding.");
 
   console.log("Seeding super admin...");
   
@@ -33,7 +36,7 @@ async function main() {
     },
   });
 
-  console.log("Super admin seeded:", user.email);
+  console.log("Super admin seeded.");
 }
 
 main()

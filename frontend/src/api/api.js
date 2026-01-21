@@ -9,12 +9,9 @@ import { ensureApiBaseUrl, normalizeEndpointPath } from "./apiBase";
 const rawBase = import.meta.env.VITE_API_URL;
 
 if (!rawBase && !import.meta.env.DEV) {
-  console.error(
-    "❌ VITE_API_URL is not set! Please set VITE_API_URL in your .env file.\n" +
-    "Example: VITE_API_URL=https://server.soukboudouaou.com"
-  );
-  throw new Error(
-    "VITE_API_URL environment variable is required. Please set it in your .env file."
+  console.warn(
+    "VITE_API_URL is not set. Falling back to same-origin requests. " +
+      "Set VITE_API_URL in your environment if your API is hosted on a different domain.",
   );
 }
 
@@ -50,7 +47,7 @@ async function refreshAccessToken() {
   const refreshToken = localStorage.getItem("refreshToken");
   const res = await refreshClient.post(
     "/auth/refresh",
-    refreshToken ? { refreshToken } : undefined
+    refreshToken ? { refreshToken } : undefined,
   );
   const token = res.data?.token;
   if (token) localStorage.setItem("token", token);
@@ -66,30 +63,39 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const original = error.config;
     const url = String(original?.url || "");
-    
+
     // Don't log network errors or CORS errors - they're handled gracefully
-    const isNetworkError = !error.response || error.code === "ERR_NETWORK" || error.code === "ERR_CONNECTION_RESET";
-    const isCorsError = error.message?.includes("CORS") || error.message?.includes("Access-Control");
-    
+    const isNetworkError =
+      !error.response ||
+      error.code === "ERR_NETWORK" ||
+      error.code === "ERR_CONNECTION_RESET";
+    const isCorsError =
+      error.message?.includes("CORS") ||
+      error.message?.includes("Access-Control");
+
     // Suppress console errors for expected 404s (site settings endpoints)
-    const isSiteSettings404 = 
-      status === 404 && 
-      (url.includes("/site/moving-header") || 
-       url.includes("/site/hero-slides") || 
-       url.includes("/site/cta") || 
-       url.includes("/site/footer") ||
-       url.includes("/site/logo"));
-    
+    const isSiteSettings404 =
+      status === 404 &&
+      (url.includes("/site/moving-header") ||
+        url.includes("/site/hero-slides") ||
+        url.includes("/site/cta") ||
+        url.includes("/site/footer") ||
+        url.includes("/site/logo"));
+
     // Suppress console errors for expected 400s (login with invalid credentials)
-    const isLogin400 = 
-      status === 400 && 
-      url.includes("/auth/login");
-    
+    const isLogin400 = status === 400 && url.includes("/auth/login");
+
     // Only log unexpected errors in development
-    if (!isNetworkError && !isCorsError && !isSiteSettings404 && !isLogin400 && import.meta.env.DEV) {
+    if (
+      !isNetworkError &&
+      !isCorsError &&
+      !isSiteSettings404 &&
+      !isLogin400 &&
+      import.meta.env.DEV
+    ) {
       console.error("API Error:", error.message);
     }
-    
+
     if (
       status === 401 &&
       !original?._retry &&
@@ -118,7 +124,7 @@ api.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
