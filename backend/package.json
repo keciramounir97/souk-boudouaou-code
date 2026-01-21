@@ -11,7 +11,7 @@
     "prisma:push": "prisma db push",
     "prisma:pull": "prisma db pull",
     "prisma:validate": "prisma validate",
-    "build": "npx prisma generate"
+    "build": "npx prisma generate && npx prisma db push"
   },
   "keywords": [],
   "author": "",
