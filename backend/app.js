@@ -70,13 +70,13 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        connectSrc: ["'self'", ...allowedOrigins],
+        connectSrc: ["'self'", "*"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         imgSrc: ["'self'", "data:", "https:", "http:", "blob:", "*"],
       },
     },
-    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginResourcePolicy: false,
     crossOriginEmbedderPolicy: false,
   })
 );
